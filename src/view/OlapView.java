@@ -17,6 +17,7 @@ import javax.swing.JScrollPane;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 
 public class OlapView {
 
@@ -27,6 +28,8 @@ public class OlapView {
 	private JTextField equipmentTextField;
 	private int lastLocation;
 	private final String[] keys = new String[]{"hpq.hh.mun","hpq.hh.brgy","hpq.hh.id","hpq.aquani.aquanitype","hpq.aquaequip.aquaequiptype"};
+	private final String[] labels = new String[]{"volume", "municipality", "barangay", "household", "type", "equipment type"};
+	private ArrayList<String> columnLabels;
 	/**
 	 * Launch the application.
 	 */
@@ -63,12 +66,14 @@ public class OlapView {
         } catch (javax.swing.UnsupportedLookAndFeelException ex) {
             java.util.logging.Logger.getLogger(OlapView.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
+		columnLabels = new ArrayList();
 		query = new QueryBuilder()
-					.addSelect("total_aquani_vol")
+					.addSelect("total_aquani_vol as " + labels[0])
 					.addFrom("fact_table")
 					.addCondition("hpq.hh.id", "null")
 					.addCondition("hpq.aquani.id", "null")
 					.addCondition("hpq.aquaniequip.id", "null");
+		columnLabels.add(labels[0]);
 		initialize();
 	}
 
@@ -85,6 +90,13 @@ public class OlapView {
 		lblNewLabel.setFont(new Font("Tahoma", Font.PLAIN, 15));
 		
 		JButton executeButton = new JButton("Execute");
+		executeButton.addActionListener(new ActionListener(){
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				DefaultDAO dao = new DefaultDAO();
+				new ResultFrame(dao.executeQuery(query.build()), columnLabels).setVisible(true);
+			}
+		});
 		
 		JScrollPane queryScrollPane = new JScrollPane();
 		
@@ -104,8 +116,11 @@ public class OlapView {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				if(lastLocation != 0){
-					query.removeGrouping(keys[lastLocation-1]);
-					query.removeSelect(keys[lastLocation-1]);
+					if(lastLocation > locationComboBox.getSelectedIndex()){
+						query.removeGrouping(keys[lastLocation-1]);
+						query.removeSelect(keys[lastLocation-1] + " as " + labels[lastLocation + 1]);
+						columnLabels.remove(labels[lastLocation + 1]);
+					}
 					query.addCondition(keys[2], "null");
 					query.removeCondition(keys[lastLocation-1]);
 				}else{
@@ -114,7 +129,8 @@ public class OlapView {
 				if(locationComboBox.getSelectedIndex() != 0){
 					query.removeCondition(keys[2]);
 					query.addGrouping(keys[locationComboBox.getSelectedIndex()-1]);
-					query.addSelect(keys[locationComboBox.getSelectedIndex()-1]);
+					query.addSelect(keys[locationComboBox.getSelectedIndex()-1] + " as " + labels[lastLocation + 1]);
+					columnLabels.add(labels[lastLocation + 1]);
 				}else{
 					query.removeFrom("hpq.hh");
 				}
@@ -147,13 +163,15 @@ public class OlapView {
 					query.addFrom("hpq.aquani");
 					query.removeCondition("hpq.aquani.id");
 	                query.addGrouping(keys[3]);
-					query.addSelect(keys[3]);
+					query.addSelect(keys[3] + " as " + labels[4]);
+					columnLabels.add(labels[4]);
 				}else{
 					query.removeFrom("hpq.aquani");
 					query.addCondition("hpq.aquani.id", "null");
 					query.removeCondition(keys[3]);
 	                query.removeGrouping(keys[3]);
-					query.removeSelect(keys[3]);
+					query.removeSelect(keys[3] + " as " + labels[4]);
+					columnLabels.remove(labels[4]);
 				}
                 tpQuery.setText(query.build());
 			}
@@ -188,13 +206,15 @@ public class OlapView {
 					query.addFrom("hpq.aquaniequip");
 					query.removeCondition("hpq.aquaniequip.id");
 	                query.addGrouping(keys[4]);
-					query.addSelect(keys[4]);
+					query.addSelect(keys[4] + " as " + labels[5]);
+					columnLabels.add(labels[5]);
 				}else{
 					query.removeFrom("hpq.aquaniequip");
 					query.addCondition("hpq.aquaniequip.id", "null");
 	                query.removeGrouping(keys[4]);
 					query.removeCondition(keys[4]);
-					query.removeSelect(keys[4]);
+					query.removeSelect(keys[4] + " as " + labels[5]);
+					columnLabels.remove(labels[5]);
 				}
                 tpQuery.setText(query.build());
 			}

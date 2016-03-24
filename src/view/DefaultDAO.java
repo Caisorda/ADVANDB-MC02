@@ -7,20 +7,18 @@ import java.sql.SQLException;
 
 public class DefaultDAO {
 
-	public double executeQuery(String query){
+	public ResultSet executeQuery(String query){
+		ResultSet rs = null;
 		try{
 			PreparedStatement pstmt;
 			try(Connection conn = DBConnector.getConnection()){
 				pstmt = conn.prepareStatement(query);
 
 //				long start = System.currentTimeMillis();
-	            ResultSet rs = pstmt.executeQuery();
+	            rs = pstmt.executeQuery();
 //	            long end = System.currentTimeMillis();
 //				System.out.println(1.0*(end - start)/1000);
 //				System.out.println();
-	            while(rs.next()){
-					
-				}
 			}
 			pstmt.close();
 		}
@@ -28,7 +26,7 @@ public class DefaultDAO {
 			e.printStackTrace();
 		}
 //		System.out.println(town.size());
-		return 0;
+		return rs;
 	}
 	
 }
