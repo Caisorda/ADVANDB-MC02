@@ -27,7 +27,7 @@ public class QueryBuilder {
 				query = query + "\nfrom " + from.get(i);
 				this.mainTable = from.get(i);
 			}else query = query + "\ninner join " + from.get(i) 
-							+ " on (" + mainTable + from.get(i) + ".id = " + from.get(i) +".id) ";
+							+ " on (" + mainTable + "." + from.get(i) + "_id = " + from.get(i) +".id) ";
 		}
 		for(String key: where.keySet()){
 			if(query.contains("where")){

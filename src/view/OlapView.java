@@ -27,8 +27,8 @@ public class OlapView {
 	private JTextField typeTextField;
 	private JTextField equipmentTextField;
 	private int lastLocation;
-	private final String[] keys = new String[]{"hpq.hh.mun","hpq.hh.brgy","hpq.hh.id","hpq.aquani.aquanitype","hpq.aquaequip.aquaequiptype"};
-	private final String[] labels = new String[]{"volume", "municipality", "barangay", "household", "type", "equipment type"};
+	private final String[] keys = new String[]{"hpq_hh.mun","hpq_hh.brgy","hpq_hh.id","hpq_aquani.aquani_type","hpq_aquaequip.equip_type"};
+	private final String[] labels = new String[]{"volume", "municipality", "barangay", "household", "aquani_type", "equipment_type"};
 	private ArrayList<String> columnLabels;
 	/**
 	 * Launch the application.
@@ -68,11 +68,11 @@ public class OlapView {
         }
 		columnLabels = new ArrayList();
 		query = new QueryBuilder()
-					.addSelect("total_aquani_vol as " + labels[0])
-					.addFrom("fact_table")
-					.addCondition("hpq.hh.id", "null")
-					.addCondition("hpq.aquani.id", "null")
-					.addCondition("hpq.aquaniequip.id", "null");
+					.addSelect("total_aquani_volume as " + labels[0])
+					.addFrom("cube")
+					.addCondition("hpq_hh_id", "null")
+					.addCondition("hpq_aquani_id", "null")
+					.addCondition("hpq_aquaequip_id", "null");
 		columnLabels.add(labels[0]);
 		initialize();
 	}
@@ -94,7 +94,7 @@ public class OlapView {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				DefaultDAO dao = new DefaultDAO();
-				new ResultFrame(dao.executeQuery(query.build()), columnLabels).setVisible(true);
+				new ResultFrame(query.build(), columnLabels).setVisible(true);
 			}
 		});
 		
@@ -121,18 +121,18 @@ public class OlapView {
 						query.removeSelect(keys[lastLocation-1] + " as " + labels[lastLocation + 1]);
 						columnLabels.remove(labels[lastLocation + 1]);
 					}
-					query.addCondition(keys[2], "null");
+					query.addCondition("hpq_hh_id", "null");
 					query.removeCondition(keys[lastLocation-1]);
 				}else{
-					query.addFrom("hpq.hh");
+					query.addFrom("hpq_hh");
 				}
 				if(locationComboBox.getSelectedIndex() != 0){
-					query.removeCondition(keys[2]);
+					query.removeCondition("hpq_hh_id");
 					query.addGrouping(keys[locationComboBox.getSelectedIndex()-1]);
 					query.addSelect(keys[locationComboBox.getSelectedIndex()-1] + " as " + labels[lastLocation + 1]);
 					columnLabels.add(labels[lastLocation + 1]);
 				}else{
-					query.removeFrom("hpq.hh");
+					query.removeFrom("hpq_hh");
 				}
                 tpQuery.setText(query.build());
                 lastLocation = locationComboBox.getSelectedIndex();
@@ -160,14 +160,14 @@ public class OlapView {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				if(typeComboBox.getSelectedIndex() != 0){
-					query.addFrom("hpq.aquani");
-					query.removeCondition("hpq.aquani.id");
+					query.addFrom("hpq_aquani");
+					query.removeCondition("hpq_aquani_id");
 	                query.addGrouping(keys[3]);
 					query.addSelect(keys[3] + " as " + labels[4]);
 					columnLabels.add(labels[4]);
 				}else{
-					query.removeFrom("hpq.aquani");
-					query.addCondition("hpq.aquani.id", "null");
+					query.removeFrom("hpq_aquani");
+					query.addCondition("hpq_aquani_id", "null");
 					query.removeCondition(keys[3]);
 	                query.removeGrouping(keys[3]);
 					query.removeSelect(keys[3] + " as " + labels[4]);
@@ -203,14 +203,14 @@ public class OlapView {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				if(equipmentComboBox.getSelectedIndex() != 0){
-					query.addFrom("hpq.aquaniequip");
-					query.removeCondition("hpq.aquaniequip.id");
+					query.addFrom("hpq_aquaequip");
+					query.removeCondition("hpq_aquaequip_id");
 	                query.addGrouping(keys[4]);
 					query.addSelect(keys[4] + " as " + labels[5]);
 					columnLabels.add(labels[5]);
 				}else{
-					query.removeFrom("hpq.aquaniequip");
-					query.addCondition("hpq.aquaniequip.id", "null");
+					query.removeFrom("hpq_aquaniequip");
+					query.addCondition("hpq_aquaequip_id", "null");
 	                query.removeGrouping(keys[4]);
 					query.removeCondition(keys[4]);
 					query.removeSelect(keys[4] + " as " + labels[5]);
@@ -237,14 +237,16 @@ public class OlapView {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				query = new QueryBuilder()
-						.addSelect("total_aquani_vol")
-						.addFrom("fact_table")
-						.addCondition("hpq.id", "null")
-						.addCondition("hpq.aquani.id", "null")
-						.addCondition("hpq.aquaniequip.id", "null");
+						.addSelect("total_aquani_volume as " + labels[0])
+						.addFrom("cube")
+						.addCondition("hpq_hh_id", "null")
+						.addCondition("hpq_aquani_id", "null")
+						.addCondition("hpq_aquaequip_id", "null");
+				columnLabels.clear();
+				columnLabels.add(labels[0]);
 				tpQuery.setText(query.build());
-				locationComboBox.setSelectedIndex(0);;
-				typeComboBox.setSelectedIndex(0);;
+				locationComboBox.setSelectedIndex(0);
+				typeComboBox.setSelectedIndex(0);
 				equipmentComboBox.setSelectedIndex(0);
 			}
         });
