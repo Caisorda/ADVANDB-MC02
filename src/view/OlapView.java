@@ -30,25 +30,7 @@ public class OlapView {
 	private final String[] keys = new String[]{"hpq_hh.mun","hpq_hh.brgy","hpq_hh.id","hpq_aquani.aquani_type","hpq_aquaequip.equip_type"};
 	private final String[] labels = new String[]{"volume", "municipality", "barangay", "household", "aquani_type", "equipment_type"};
 	private ArrayList<String> columnLabels;
-	/**
-	 * Launch the application.
-	 */
-	public static void main(String[] args) {
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				try {
-					OlapView window = new OlapView();
-					window.frmAquaticProduce.setVisible(true);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});
-	}
-
-	/**
-	 * Create the application.
-	 */
+	
 	public OlapView() {
 		try {
             for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
@@ -75,6 +57,7 @@ public class OlapView {
 					.addCondition("hpq_aquaequip_id", "null");
 		columnLabels.add(labels[0]);
 		initialize();
+		this.frmAquaticProduce.setVisible(true);
 	}
 
 	/**
@@ -186,7 +169,7 @@ public class OlapView {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				if(!typeTextField.getText().equals("") && !((String)typeComboBox.getSelectedItem()).equals("None")){
-					query.addCondition(keys[3], typeTextField.getText());
+					query.addCondition("hpq_aquani.id", typeTextField.getText());
 	                tpQuery.setText(query.build());
 				}
 			}
@@ -226,7 +209,7 @@ public class OlapView {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				if(!equipmentTextField.getText().equals("") && !((String)equipmentComboBox.getSelectedItem()).equals("None")){
-					query.addCondition(keys[4], equipmentTextField.getText());
+					query.addCondition("hpq_aquaequip.id", equipmentTextField.getText());
 	                tpQuery.setText(query.build());
 				}
 			}
