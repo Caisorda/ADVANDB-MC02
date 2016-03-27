@@ -50,7 +50,7 @@ public class OlapView {
         }
 		columnLabels = new ArrayList();
 		query = new QueryBuilder()
-					.addSelect("total_aquani_volume as " + labels[0])
+					.addSelect("sum(total_aquani_volume) as " + labels[0])
 					.addFrom("cube")
 					.addCondition("hpq_hh_id", "null")
 					.addCondition("hpq_aquani_id", "null")
@@ -220,7 +220,7 @@ public class OlapView {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				query = new QueryBuilder()
-						.addSelect("total_aquani_volume as " + labels[0])
+						.addSelect("sum(total_aquani_volume) as " + labels[0])
 						.addFrom("cube")
 						.addCondition("hpq_hh_id", "null")
 						.addCondition("hpq_aquani_id", "null")
