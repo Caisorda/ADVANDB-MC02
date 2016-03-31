@@ -73,13 +73,6 @@ public class OlapView {
 		lblNewLabel.setFont(new Font("Tahoma", Font.PLAIN, 15));
 		
 		JButton executeButton = new JButton("Execute");
-		executeButton.addActionListener(new ActionListener(){
-			@Override
-			public void actionPerformed(ActionEvent arg0) {
-				DefaultDAO dao = new DefaultDAO();
-				new ResultFrame(query.build(), columnLabels).setVisible(true);
-			}
-		});
 		
 		JScrollPane queryScrollPane = new JScrollPane();
 		
@@ -91,6 +84,13 @@ public class OlapView {
 		JTextPane tpQuery = new JTextPane();
 		tpQuery.setText(query.build());
 		queryScrollPane.setViewportView(tpQuery);
+		executeButton.addActionListener(new ActionListener(){
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				DefaultDAO dao = new DefaultDAO();
+				new ResultFrame(tpQuery.getText(), columnLabels).setVisible(true);
+			}
+		});
 		
 		JComboBox locationComboBox = new JComboBox();
 		lastLocation = 0;
@@ -100,9 +100,12 @@ public class OlapView {
 			public void actionPerformed(ActionEvent arg0) {
 				if(lastLocation != 0){
 					if(lastLocation > locationComboBox.getSelectedIndex()){
-						query.removeGrouping(keys[lastLocation-1]);
-						query.removeSelect(keys[lastLocation-1] + " as " + labels[lastLocation + 1]);
-						columnLabels.remove(labels[lastLocation + 1]);
+						for (int i = locationComboBox.getSelectedIndex(); i <= lastLocation; i++) {
+							System.out.println(i);
+							query.removeGrouping(keys[i]);
+							query.removeSelect(keys[i] + " as " + labels[i + 1]);
+							columnLabels.remove(labels[i + 1]);
+						}
 					}
 					query.addCondition("hpq_hh_id", "null");
 					query.removeCondition(keys[lastLocation-1]);
@@ -111,9 +114,12 @@ public class OlapView {
 				}
 				if(locationComboBox.getSelectedIndex() != 0){
 					query.removeCondition("hpq_hh_id");
-					query.addGrouping(keys[locationComboBox.getSelectedIndex()-1]);
-					query.addSelect(keys[locationComboBox.getSelectedIndex()-1] + " as " + labels[lastLocation + 1]);
-					columnLabels.add(labels[lastLocation + 1]);
+					for (int i = 1; i <= locationComboBox.getSelectedIndex(); i++) {
+						query.addGrouping(keys[i - 1]);
+						query.addSelect(keys[i - 1] + " as "
+								+ labels[i]);
+						columnLabels.add(labels[i]);
+					}
 				}else{
 					query.removeFrom("hpq_hh");
 				}
