@@ -17,7 +17,7 @@ public class DBConnector {
 	
 	static final String url = "jdbc:mysql://localhost:3306/star_schema"; //schema name here
 	static final String username = "root"; //set username
-	static final String password = "";
+	static final String password = "Pr0crastinate";
 	
 	public DBConnector(){}
 	
